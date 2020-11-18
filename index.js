@@ -135,8 +135,8 @@ io.on('connection', socket => {
 //     res.send("upload success");
 // })
 
-app.use('/', (req, res) => {
-    console.log('Server ok');
+app.get('/',(req,res)=>{
+    res.json({connect:'ok'});
 })
 
 // connection
