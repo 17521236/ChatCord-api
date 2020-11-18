@@ -20,8 +20,8 @@ const io = require('socket.io')(server, {
 // const { addUser, getUserById, getUsers, deletePeopleById, isExisted } = require('./helper/user.helper');
 // const { getIcons } = require('./helper/resource.helper');
 
-// app.use(express.static('public'));
-// //socket code
+ app.use(express.static('public'));
+//socket code
 io.on('connection', socket => {
     //when connected -> emit list icons to user
     console.log(socket.id);
@@ -145,7 +145,3 @@ app.get('/', (req, res) => {
 server.listen(port, () => {
     console.log(`Port ${port} is running ...`);
 })
-
-// app.listen(port, () => {
-//     console.log(`Port ${port} is running ...`)
-// })
