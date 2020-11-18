@@ -16,106 +16,105 @@ const io = require('socket.io')(server, {
     origins: '*:*'
 });
 
-// const moment = require('moment');
-// const { addUser, getUserById, getUsers, deletePeopleById, isExisted } = require('./helper/user.helper');
-// const { getIcons } = require('./helper/resource.helper');
+const moment = require('moment');
+const { addUser, getUserById, getUsers, deletePeopleById, isExisted } = require('./helper/user.helper');
+const { getIcons } = require('./helper/resource.helper');
 
- app.use(express.static('public'));
+app.use(express.static('public'));
 //socket code
 io.on('connection', socket => {
     //when connected -> emit list icons to user
     console.log(socket.id);
-    // socket.emit('server-response-icons', getIcons());
-    socket.emit('server-response-icons', 'getIcons()');
-})
-//     //disconnected
-//     socket.on('disconnect', () => {
-//         const user = getUserById(socket.id);
-//         if (!user) {
-//             return;
-//         }
-//         deletePeopleById(socket.id);
-//         socket.broadcast.to(user?.room).emit('server-response-send-message', {
-//             avatarUrl: 'icons/avatar/robot.svg',
-//             username: '* Bot *',
-//             message: `${user.username} has left the chat`,
-//             time: moment().format('LT'),
-//             isMine: false
-//         });
-//         // notification number people in room
-//         socket.broadcast.to(user?.room).emit('server-response-login', {
-//             room: user.room,
-//             users: getUsers(user.room)
-//         });
-//     })
+    socket.emit('server-response-icons', getIcons());
 
-//     //login
-//     socket.on('client-login', (data) => {
+    //disconnected
+    socket.on('disconnect', () => {
+        const user = getUserById(socket.id);
+        if (!user) {
+            return;
+        }
+        deletePeopleById(socket.id);
+        socket.broadcast.to(user?.room).emit('server-response-send-message', {
+            avatarUrl: 'icons/avatar/robot.svg',
+            username: '* Bot *',
+            message: `${user.username} has left the chat`,
+            time: moment().format('LT'),
+            isMine: false
+        });
+        // notification number people in room
+        socket.broadcast.to(user?.room).emit('server-response-login', {
+            room: user.room,
+            users: getUsers(user.room)
+        });
+    })
 
-//         // check duplication
-//         if (isExisted(data.username)) {
-//             socket.emit('server-response-login-fail', 'Username existed !');
-//         } else {
-//             socket.emit('server-response-login-success', '');
-//             // add user to list users
-//             addUser(socket.id, data.username, data.room, data.avatarUrl);
-//             //get user
-//             const user = getUserById(socket.id);
-//             if (!user) return;
-//             //join to room
-//             socket.join(user.room);
-//             // message to other people
-//             socket.broadcast.to(user.room).emit('server-response-send-message', {
-//                 avatarUrl: 'icons/avatar/robot.svg',
-//                 username: '* Bot *',
-//                 message: `${user.username} has joined room`,
-//                 time: moment().format('LT'),
-//                 isMine: false
-//             });
-//             // message to current socket
-//             socket.emit('server-response-send-message', {
-//                 avatarUrl: 'icons/avatar/robot.svg',
-//                 username: '* Bot *',
-//                 message: `Welcome ${user.username} !!! Let's send your first message to other people in room`,
-//                 time: moment().format('LT'),
-//                 isMine: false
-//             });
-//             // notification number people in room
-//             io.to(user.room).emit('server-response-login', {
-//                 room: user.room,
-//                 users: getUsers(user.room)
-//             });
-//         }
-//     })
+    //login
+    socket.on('client-login', (data) => {
 
-//     // send message
-//     socket.on('client-send-message', (data) => {
-//         const user = getUserById(socket.id);
-//         if (!user) {
-//             socket.emit('server-response-user-logout', true);
-//             return;
-//         }
-//         socket.emit('server-response-send-message', {
-//             avatarUrl: user.avatarUrl,
-//             username: user.username,
-//             message: data,
-//             time: moment().format('LT'),
-//             isMine: true
-//         });
+        // check duplication
+        if (isExisted(data.username)) {
+            socket.emit('server-response-login-fail', 'Username existed !');
+        } else {
+            socket.emit('server-response-login-success', '');
+            // add user to list users
+            addUser(socket.id, data.username, data.room, data.avatarUrl);
+            //get user
+            const user = getUserById(socket.id);
+            if (!user) return;
+            //join to room
+            socket.join(user.room);
+            // message to other people
+            socket.broadcast.to(user.room).emit('server-response-send-message', {
+                avatarUrl: 'icons/avatar/robot.svg',
+                username: '* Bot *',
+                message: `${user.username} has joined room`,
+                time: moment().format('LT'),
+                isMine: false
+            });
+            // message to current socket
+            socket.emit('server-response-send-message', {
+                avatarUrl: 'icons/avatar/robot.svg',
+                username: '* Bot *',
+                message: `Welcome ${user.username} !!! Let's send your first message to other people in room`,
+                time: moment().format('LT'),
+                isMine: false
+            });
+            // notification number people in room
+            io.to(user.room).emit('server-response-login', {
+                room: user.room,
+                users: getUsers(user.room)
+            });
+        }
+    })
 
-//         socket.broadcast.to(user.room).emit('server-response-send-message', {
-//             avatarUrl: user.avatarUrl,
-//             username: user.username,
-//             message: data,
-//             time: moment().format('LT'),
-//             isMine: false
-//         });
-//     })
+    // send message
+    socket.on('client-send-message', (data) => {
+        const user = getUserById(socket.id);
+        if (!user) {
+            socket.emit('server-response-user-logout', true);
+            return;
+        }
+        socket.emit('server-response-send-message', {
+            avatarUrl: user.avatarUrl,
+            username: user.username,
+            message: data,
+            time: moment().format('LT'),
+            isMine: true
+        });
 
-//     socket.on('client-user-logout', (data) => {
-//         deletePeopleById(socket.id);
-//     })
-// });
+        socket.broadcast.to(user.room).emit('server-response-send-message', {
+            avatarUrl: user.avatarUrl,
+            username: user.username,
+            message: data,
+            time: moment().format('LT'),
+            isMine: false
+        });
+    })
+
+    socket.on('client-user-logout', (data) => {
+        deletePeopleById(socket.id);
+    })
+});
 
 
 
