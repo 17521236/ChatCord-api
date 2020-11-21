@@ -33,19 +33,7 @@ io.on('connection', socket => {
         if (!user) {
             return;
         }
-        deletePeopleById(socket.id);
-        socket.broadcast.to(user?.room).emit('server-response-send-message', {
-            avatarUrl: 'icons/avatar/robot.svg',
-            username: '* Bot *',
-            message: `${user.username} has left the chat`,
-            time: moment().format('LT'),
-            isMine: false
-        });
-        // notification number people in room
-        socket.broadcast.to(user?.room).emit('server-response-login', {
-            room: user.room,
-            users: getUsers(user.room)
-        });
+        logout(socket);
     })
 
     //login
@@ -58,7 +46,6 @@ io.on('connection', socket => {
             socket.emit('server-response-login-success', '');
             // add user to list users
             addUser(socket.id, data.username, data.room, data.avatarUrl);
-            //get user
             const user = getUserById(socket.id);
             if (!user) return;
             //join to room
@@ -113,10 +100,27 @@ io.on('connection', socket => {
 
     socket.on('client-user-logout', (data) => {
         deletePeopleById(socket.id);
+        logout(socket);
     })
 });
 
+function logout(socket) {
+    deletePeopleById(socket.id);
 
+    // notification left chat
+    socket.broadcast.to(user.room).emit('server-response-send-message', {
+        avatarUrl: 'icons/avatar/robot.svg',
+        username: '* Bot *',
+        message: `${user.username} has left the chat`,
+        time: moment().format('LT'),
+        isMine: false
+    });
+    // refresh room info
+    socket.broadcast.to(user.room).emit('server-response-login', {
+        room: user.room,
+        users: getUsers(user.room)
+    });
+}
 
 //setting multer
 // const multer = require("multer");
@@ -137,9 +141,9 @@ io.on('connection', socket => {
 // })
 
 app.get('/', (req, res) => {
-    res.send({ connect: 'ok' });
-})
-// connection
+        res.send({ connect: 'ok' });
+    })
+    // connection
 
 server.listen(port, () => {
     console.log(`Port ${port} is running ...`);
