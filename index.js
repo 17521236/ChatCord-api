@@ -33,7 +33,7 @@ io.on('connection', socket => {
         if (!user) {
             return;
         }
-        logout(socket);
+        logout(socket, user);
     })
 
     //login
@@ -104,7 +104,7 @@ io.on('connection', socket => {
     })
 });
 
-function logout(socket) {
+function logout(socket, user) {
     deletePeopleById(socket.id);
 
     // notification left chat
