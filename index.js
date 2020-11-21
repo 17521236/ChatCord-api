@@ -55,7 +55,7 @@ io.on('connection', socket => {
                 avatarUrl: 'icons/avatar/robot.svg',
                 username: '* Bot *',
                 message: `${user.username} has joined room`,
-                time: moment().format('LT'),
+                time: moment().utc(false).utcOffset(7).format('LT'),
                 isMine: false
             });
             // message to current socket
@@ -63,7 +63,7 @@ io.on('connection', socket => {
                 avatarUrl: 'icons/avatar/robot.svg',
                 username: '* Bot *',
                 message: `Welcome ${user.username} !!! Let's send your first message to other people in room`,
-                time: moment().format('LT'),
+                time: moment().utc(false).utcOffset(7).format('LT'),
                 isMine: false
             });
             // notification number people in room
@@ -85,7 +85,7 @@ io.on('connection', socket => {
             avatarUrl: user.avatarUrl,
             username: user.username,
             message: data,
-            time: moment().format('LT'),
+            time: moment().utc(false).utcOffset(7).format('LT'),
             isMine: true
         });
 
@@ -93,7 +93,7 @@ io.on('connection', socket => {
             avatarUrl: user.avatarUrl,
             username: user.username,
             message: data,
-            time: moment().format('LT'),
+            time: moment().utc(false).utcOffset(7).format('LT'),
             isMine: false
         });
     })
@@ -112,7 +112,7 @@ function logout(socket, user) {
         avatarUrl: 'icons/avatar/robot.svg',
         username: '* Bot *',
         message: `${user.username} has left the chat`,
-        time: moment().format('LT'),
+        time: moment().utc(false).utcOffset(7).format('LT'),
         isMine: false
     });
     // refresh room info
